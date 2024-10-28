@@ -12,6 +12,7 @@ uvicorn = {extras = ["standard"], version = "^0.32.0"}
 sqlalchemy = "^2.0.36"
 psycopg2 = "^2.9.10"
 python-dotenv = "^1.0.1"
+python-multipart = "^0.0.16"
 
 
 [build-system]

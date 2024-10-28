@@ -1,4 +1,10 @@
-from fastapi import Depends, FastAPI, HTTPException, Path, Query
+import mimetypes
+import pathlib
+import time
+from uuid import uuid4
+
+from fastapi import Depends, FastAPI, HTTPException, Path, Query, Request, File, UploadFile
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -7,6 +13,7 @@ from src.entity.models import Note
 from src.schemas.note import NoteModel, NoteResponseModel
 
 app = FastAPI()
+app.mount('/static', StaticFiles(directory='src/static'), name='static')
 
 
 @app.get('/api/healthchecker', tags=['Healthchecker'])
@@ -54,6 +61,23 @@ async def read_note(note_id: int = Path(description='The ID of the note to get',
     return note
 
 
+@app.post('/upload-file/', tags=['Upload file'])
+async def upload_file(file: UploadFile = File()):
+    pathlib.Path('src/uploads').mkdir(exist_ok=True)
+    ext = pathlib.Path(file.filename).suffix
+    filename = f'{uuid4().hex}{ext}'
+    file_path = f'src/uploads/{filename}'
+    with open(file_path, 'wb') as f:
+        f.write(await file.read())
+    return {'file_path': file_path}
 
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 
