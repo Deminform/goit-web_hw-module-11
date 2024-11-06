@@ -11,4 +11,4 @@ port = os.getenv("PORT")
 class Config:
     DB_URL = f'postgresql+asyncpg://{user}:{password}@{host}:{port}/{dbname}'
 
-config = Config()
+db_config = Config

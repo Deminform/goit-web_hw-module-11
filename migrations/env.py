@@ -7,8 +7,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from conf.config import config as app_config
-from database.db import Base
+from conf.config import db_config
+from src.entity.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +25,7 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", app_config)
+config.set_main_option("sqlalchemy.url", db_config.DB_URL)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
