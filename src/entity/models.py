@@ -1,18 +1,14 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from src.database.db import engine
+from sqlalchemy import String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
+
+from src.database.db import Base
 
 
-Base = declarative_base()
-
-
-class Note(Base):
-    __tablename__ = 'notes'
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50))
-    description = Column(String(250))
-    done = Column(Boolean, default=False)
-
-
-Base.metadata.create_all(bind=engine)
-
+class Contact(Base):
+    __tablename__ = 'contacts'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    phone: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
+    birthday: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    description: Mapped[str] = mapped_column(String(300))

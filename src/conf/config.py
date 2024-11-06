@@ -10,4 +10,7 @@ port = os.getenv("PORT")
 
 
 class Config:
-    DB_URL = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}'
+    DB_URL = f'postgresql+asyncpg://{user}:{password}@{host}:{port}/{dbname}'
+
+
+config = Config

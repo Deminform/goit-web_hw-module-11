@@ -1,26 +1,39 @@
-import os
+import contextlib
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
-load_dotenv()
-user = os.getenv("USER")
-password = os.getenv("PASSWORD")
-dbname = os.getenv("DBNAME")
-host = os.getenv("HOST")
-port = os.getenv("PORT")
-
-SQLALCHEMY_DATABASE_URL = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}'
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from src.conf.config import config
 
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+class Base(DeclarativeBase):
+    pass
+
+
+class DatabaseSessionManager:
+    def __init__(self, url: str):
+        self._engine: AsyncEngine | None = create_async_engine(url)
+        self._session_maker: async_sessionmaker = async_sessionmaker(autocommit=False, autoflush=False,
+                                                                     bind=self._engine)
+
+    @contextlib.asynccontextmanager
+    async def session(self):
+        if self._session_maker is None:
+            raise Exception('Session maker not defined')
+        session = self._session_maker()
+        try:
+            yield session
+        except SQLAlchemyError as error:
+            print(error)
+            await session.rollback()
+        finally:
+            await session.close()
+
+
+sessionmanager = DatabaseSessionManager(config.DB_URL)
+
+
+async def get_db():
+    with sessionmanager.session as session:
+        yield session
