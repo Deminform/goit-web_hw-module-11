@@ -8,9 +8,7 @@ dbname = os.getenv("DBNAME")
 host = os.getenv("HOST")
 port = os.getenv("PORT")
 
-
 class Config:
     DB_URL = f'postgresql+asyncpg://{user}:{password}@{host}:{port}/{dbname}'
 
-
-config = Config
+config = Config()

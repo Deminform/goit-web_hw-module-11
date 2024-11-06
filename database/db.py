@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-from src.conf.config import config
+from conf.config import config
 
 
 class Base(DeclarativeBase):
@@ -35,5 +35,5 @@ sessionmanager = DatabaseSessionManager(config.DB_URL)
 
 
 async def get_db():
-    with sessionmanager.session as session:
+    async with sessionmanager.session as session:
         yield session
