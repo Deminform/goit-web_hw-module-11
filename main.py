@@ -7,7 +7,7 @@ from src.routes import contacts
 
 
 app = FastAPI()
-app.include_router(contacts.router, prefix="/contacts")
+app.include_router(contacts.router, prefix="/api")
 
 
 @app.get('/')
