@@ -22,8 +22,9 @@ class ContactUpdateSchema(ContactSchema):
     birthday: date = Field(None)
     description: str = Field(None, max_length=300)
 
+
 class ContactResponseSchema(ContactSchema):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
