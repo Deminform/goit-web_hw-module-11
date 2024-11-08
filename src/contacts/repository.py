@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.entity.models import Contact
-from src.schemas.contact import ContactSchema, ContactUpdateSchema
+from src.contacts.models import Contact
+from src.contacts.schemas import ContactSchema
 
 
 async def get_contacts(limit:int, skip:int, db:AsyncSession):
