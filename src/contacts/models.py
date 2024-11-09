@@ -1,6 +1,6 @@
-from sqlalchemy import String, DateTime
+from sqlalchemy import String, DateTime, func
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, InstrumentedAttribute
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -21,3 +21,7 @@ class Contact(Base):
     @hybrid_property
     def fullname(self):
         return f'{self.first_name} {self.last_name}'
+
+    @fullname.expression
+    def fullname(cls) -> str:
+        return func.concat(cls.first_name, ' ', cls.last_name)

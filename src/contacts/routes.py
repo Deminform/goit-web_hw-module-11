@@ -8,43 +8,53 @@ from src.contacts.schemas import ContactSchema, ContactResponseSchema, ContactUp
 router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 
+# @router.get('/', response_model=list[ContactResponseSchema])
+# async def get_contacts(
+#         limit: int = Query(10, ge=10, le=100),
+#         offset: int = Query(0, ge=0),
+#         db: AsyncSession = Depends(get_db)):
+#
+#     contacts = await repo_contacts.get_contacts(limit, offset, db)
+#     return contacts
+
 @router.get('/', response_model=list[ContactResponseSchema])
-async def get_contacts(
+async def get_contacts_upcoming_birthday(
         limit: int = Query(10, ge=10, le=100),
         offset: int = Query(0, ge=0),
+        days_to_birthday: int = Query(7, ge=0, le=365, description='Set 0 - for disable filter by birthday'),
         db: AsyncSession = Depends(get_db)):
 
-    contacts = await repo_contacts.get_contacts(limit, offset, db)
+    contacts = await repo_contacts.get_contacts(limit, offset, days_to_birthday, db)
     return contacts
 
 
-@router.get('/search', response_model=ContactResponseSchema)
-async def get_contact(contact_id: int = None, fullname: str = None, db: AsyncSession = Depends(get_db)):
+@router.get('/search', response_model=list[ContactResponseSchema])
+async def get_contact(email: str = None, fullname: str = None, db: AsyncSession = Depends(get_db)):
     contact = None
-    if id:
-        contact = await repo_contacts.get_contact_by_id(contact_id, db)
+    if email:
+        contact = await repo_contacts.get_contact_by_email(email, db)
 
     elif fullname:
         contact = await repo_contacts.get_contact_by_name(fullname, db)
 
-    if contact is None:
+    elif contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
     return contact
 
 
-
-# @router.get('/{contact_id}', response_model=ContactResponseSchema)
-# async def get_contact(contact_id: int, db: AsyncSession = Depends(get_db)):
-#     contact = await repo_contacts.get_contact_by_id(contact_id, db)
-#     if contact is None:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
-#     return contact
+@router.get('/{contact_id}', response_model=ContactResponseSchema)
+async def get_contact(contact_id: int, db: AsyncSession = Depends(get_db)):
+    contact = await repo_contacts.get_contact_by_id(contact_id, db)
+    if contact is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+    return contact
 
 
 @router.post('/', response_model=ContactResponseSchema, status_code=status.HTTP_201_CREATED)
 async def create_contact(body: ContactSchema, db: AsyncSession = Depends(get_db)):
     contact = await repo_contacts.create_contact(body, db)
     return contact
+
 
 
 @router.put('/{contact_id}')
