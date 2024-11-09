@@ -20,26 +20,34 @@ router = APIRouter(prefix="/contacts", tags=["contacts"])
 @router.get('/', response_model=list[ContactResponseSchema])
 async def get_contacts_upcoming_birthday(
         limit: int = Query(10, ge=10, le=100),
-        offset: int = Query(0, ge=0),
-        days_to_birthday: int = Query(7, ge=0, le=365, description='Set 0 - for disable filter by birthday'),
+        offset: int = Query(None, ge=0),
+        days_to_birthday: int = Query(None, ge=0, le=365, description='None - for disable filter by birthday'),
+        email: str = Query(None, description='Full or part of an email'),
+        fullname: str = Query(None, description='Full or part of a name'),
         db: AsyncSession = Depends(get_db)):
 
-    contacts = await repo_contacts.get_contacts(limit, offset, days_to_birthday, db)
+    contacts = await repo_contacts.get_contacts(
+        limit=limit,
+        skip=offset,
+        days=days_to_birthday,
+        email=email,
+        fullname=fullname,
+        db=db)
     return contacts
 
 
-@router.get('/search', response_model=list[ContactResponseSchema])
-async def get_contact(email: str = None, fullname: str = None, db: AsyncSession = Depends(get_db)):
-    contact = None
-    if email:
-        contact = await repo_contacts.get_contact_by_email(email, db)
-
-    elif fullname:
-        contact = await repo_contacts.get_contact_by_name(fullname, db)
-
-    elif contact is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
-    return contact
+# @router.get('/search', response_model=list[ContactResponseSchema])
+# async def get_contact(email: str = None, fullname: str = None, db: AsyncSession = Depends(get_db)):
+#     contact = None
+#     if email:
+#         contact = await repo_contacts.get_contact_by_email(email, db)
+#
+#     elif fullname:
+#         contact = await repo_contacts.get_contact_by_name(fullname, db)
+#
+#     elif contact is None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+#     return contact
 
 
 @router.get('/{contact_id}', response_model=ContactResponseSchema)
