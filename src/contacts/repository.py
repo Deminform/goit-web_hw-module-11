@@ -24,8 +24,10 @@ async def get_contacts(limit: int, skip: int, days: int, email, fullname, db: As
 
 
 async def get_contact_by_id(contact_id: int, db: AsyncSession):
-    stmt = select(Contact).filter_by(id=contact_id)
-    contact = await db.execute(stmt)
+    contact = select(Contact).filter_by(id=contact_id)
+    if contact is None:
+        return None
+    contact = await db.execute(contact)
     return contact.scalar_one_or_none()
 
 
@@ -63,6 +65,9 @@ async def get_contact_by_email(stmt, email: str):
 
 async def create_contact(body: ContactSchema, db: AsyncSession):
     contact = Contact(**body.model_dump(exclude_unset=True))
+    if contact is None:
+        return None
+
     db.add(contact)
     await db.commit()
     await db.refresh(contact)
@@ -73,6 +78,9 @@ async def update_contact(contact_id: int, body: ContactUpdateSchema, db: AsyncSe
     stmt = select(Contact).filter_by(id=contact_id)
     result = await db.execute(stmt)
     contact = result.scalar_one_or_none()
+
+    if contact is None:
+        return None
 
     for key, value in body.model_dump(exclude_unset=True).items():
         setattr(contact, key, value)

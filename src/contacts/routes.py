@@ -64,10 +64,9 @@ async def create_contact(body: ContactSchema, db: AsyncSession = Depends(get_db)
     return contact
 
 
-
 @router.put('/{contact_id}')
 async def update_contact(body: ContactUpdateSchema, contact_id: int, db: AsyncSession = Depends(get_db)):
-    contact = await repo_contacts.update_contact(contact_id, body, db)
+    contact = await repo_contacts.update_contact(contact_id=contact_id, body=body, db=db)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
     return contact

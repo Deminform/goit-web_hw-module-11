@@ -8,7 +8,7 @@ class ContactSchema(BaseModel):
     last_name: str = Field(min_length=2, max_length=50)
     email: EmailStr = Field(..., max_length=50)
     phone: str = Field(max_length=10)
-    birthday: date = Field(None)
+    birthday: date = Field(...)
     description: str = Field(None, max_length=300)
 
 
