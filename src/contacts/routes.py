@@ -8,15 +8,6 @@ from src.contacts.schemas import ContactSchema, ContactResponseSchema, ContactUp
 router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 
-# @router.get('/', response_model=list[ContactResponseSchema])
-# async def get_contacts(
-#         limit: int = Query(10, ge=10, le=100),
-#         offset: int = Query(0, ge=0),
-#         db: AsyncSession = Depends(get_db)):
-#
-#     contacts = await repo_contacts.get_contacts(limit, offset, db)
-#     return contacts
-
 @router.get('/', response_model=list[ContactResponseSchema])
 async def get_contacts_upcoming_birthday(
         limit: int = Query(10, ge=10, le=100),
@@ -25,7 +16,6 @@ async def get_contacts_upcoming_birthday(
         email: str = Query(None, description='Full or part of an email'),
         fullname: str = Query(None, description='Full or part of a name'),
         db: AsyncSession = Depends(get_db)):
-
     contacts = await repo_contacts.get_contacts(
         limit=limit,
         skip=offset,
@@ -34,20 +24,6 @@ async def get_contacts_upcoming_birthday(
         fullname=fullname,
         db=db)
     return contacts
-
-
-# @router.get('/search', response_model=list[ContactResponseSchema])
-# async def get_contact(email: str = None, fullname: str = None, db: AsyncSession = Depends(get_db)):
-#     contact = None
-#     if email:
-#         contact = await repo_contacts.get_contact_by_email(email, db)
-#
-#     elif fullname:
-#         contact = await repo_contacts.get_contact_by_name(fullname, db)
-#
-#     elif contact is None:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
-#     return contact
 
 
 @router.get('/{contact_id}', response_model=ContactResponseSchema)

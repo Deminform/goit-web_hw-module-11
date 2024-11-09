@@ -8,7 +8,6 @@ from src.contacts.schemas import ContactSchema, ContactUpdateSchema
 
 
 async def get_contacts(limit: int, skip: int, days: int, email, fullname, db: AsyncSession):
-
     stmt = select(Contact)
     if fullname:
         stmt = await get_contact_by_name(stmt, fullname)
@@ -33,7 +32,7 @@ async def get_contact_by_id(contact_id: int, db: AsyncSession):
 
 async def get_contact_for_upcoming_birthday(stmt, days: int):
     today = date.today()
-    end_date = today + timedelta(days=days-1)
+    end_date = today + timedelta(days=days - 1)
 
     day_today = today.timetuple().tm_yday
     day_end_date = end_date.timetuple().tm_yday
@@ -56,7 +55,6 @@ async def get_contact_for_upcoming_birthday(stmt, days: int):
 
 async def get_contact_by_name(stmt, contact_fullname: str):
     return stmt.where(Contact.fullname.ilike(f'%{contact_fullname}%'))
-
 
 
 async def get_contact_by_email(stmt, email: str):

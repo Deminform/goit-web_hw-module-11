@@ -1,6 +1,6 @@
 from sqlalchemy import String, DateTime, func
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, mapped_column, InstrumentedAttribute
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase
 
 
